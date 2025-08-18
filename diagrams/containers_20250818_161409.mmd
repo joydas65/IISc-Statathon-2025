@@ -1,0 +1,33 @@
+flowchart TB
+  subgraph Browser
+    FE[React App\n• Filter UI & examples\n• Monaco SQL editor\n• Result grid & JSON/CSV export\n• Charts (optional)]
+  end
+
+  subgraph Backend [API Gateway (FastAPI)]
+    API[/REST: /datasets, /schema/{survey}, /{survey}/data, /query, /usage/me, /metrics/health/]
+    Auth[RBAC\nJWT/API Key]
+    Meter[Usage Metering\n• rows/bytes/day • QPS]
+    Rate[Rate Limiting\nToken bucket]
+    Billing[Micro‑payment Simulator\nTest gateway → credit token]
+    Policy[Privacy Guard (DPDP)\n• PII denylist\n• Aggregation enforcement\n• k‑anonymity suppression]
+    SQLV[SQL Validator/Rewriter\n• SELECT‑only\n• Param binding\n• Default LIMIT]
+    Exec[Execution Orchestrator\n• Worker pool\n• Timeout\n• Pagination]
+    Cache[(Redis Cache)]
+    Audit[(Audit & Usage Store)]
+    Registry[(Registry DB\nSurveys, variables, codebooks, policies, allowlist filters)]
+  end
+
+  subgraph DataPlane [Data Plane]
+    Duck[ DuckDB ]
+    Files[(Parquet/CSV — Local FS/S3)]
+    PG[(Optional Postgres/Warehouse)]
+  end
+
+  FE -->|HTTP| API
+  API --> Auth --> Meter --> Rate --> Billing --> Policy --> SQLV --> Exec --> Duck
+  Exec --> Cache
+  API --> Audit
+  API --> Registry
+  Duck --> Files
+  Duck --> PG
+  API -->|JSON/CSV| FE

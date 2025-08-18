@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle rectangle
+actor "User" as U
+node "Web UI (React)" as UI
+package "API Gateway (FastAPI)" as GW {
+  [Auth & RBAC\n(JWT/API Key)] as AUTH
+  [Usage Metering & Rate Limits] as METER
+  [Micro-payment Simulator] as BILL
+  [Privacy Guard (DPDP)\nPII block / Aggregation / k-suppression] as PRIV
+  [SQL Validator / Rewriter\nSELECT-only / Param binding / LIMIT] as SQLV
+  [Query Orchestrator\nTimeouts / Pagination] as ORCH
+  database "Registry DB\n(surveys, variables, codebooks, policies)" as REG
+  [Cache] as CACHE
+  [Audit & Usage Store] as AUD
+}
+database "DuckDB Engine" as DUCK
+folder "Survey Storage\n(Parquet/CSV FS/S3)" as STORE
+database "Optional Warehouse\n(Postgres)" as PG
+
+U --> UI : Queries & filters
+UI --> GW : /{survey}/data, /query
+GW --> DUCK : safe SQL
+DUCK --> STORE
+GW --> PG : federated (optional)
+GW --> UI : JSON/CSV
+
+GW ..> REG
+GW ..> CACHE
+GW ..> AUD
+GW ..> AUTH
+GW ..> METER
+GW ..> BILL
+GW ..> PRIV
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+skinparam componentStyle rectangle
+actor "User" as U
+node "Browser" {
+  [React App\nFilter UI, Monaco, Results, Charts] as FE
+}
+
+node "API Gateway (FastAPI)" as BE {
+  [REST: /datasets, /schema/{survey}, /{survey}/data, /query, /usage/me] as API
+  [RBAC (JWT/API Key)] as AUTH
+  [Usage Metering (rows/bytes/QPS)] as METER
+  [Rate Limiting (token bucket)] as RATE
+  [Micro-payment Simulator] as BILL
+  [Privacy Guard (DPDP)] as PRIV
+  [SQL Validator/Rewriter] as SQLV
+  [Execution Orchestrator (timeout, pagination)] as EXEC
+  [Redis Cache] as CACHE
+  [Audit & Usage Store] as AUD
+  database "Registry DB" as REG
+}
+
+node "Data Plane" {
+  database "DuckDB" as DDB
+  folder "Parquet/CSV (FS/S3)" as FILES
+  database "Postgres/Warehouse" as PSQL
+}
+
+U --> FE
+FE --> API
+API --> AUTH --> METER --> RATE --> BILL --> PRIV --> SQLV --> EXEC --> DDB
+EXEC --> CACHE
+API --> AUD
+API --> REG
+DDB --> FILES
+DDB --> PSQL
+API --> FE
+@enduml

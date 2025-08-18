@@ -1,0 +1,28 @@
+flowchart LR
+    user[Data Analyst / Researcher / Public User] -->|Queries & filters| ui[Web UI (React)]
+    ui -->|/plfs/data, /{survey}/data, /query| apigw[API Gateway (FastAPI)]
+
+    subgraph APIGW[API Gateway]
+      auth[Auth & RBAC\nJWT / API Key]
+      meter[Usage Metering & Rate Limits\n(rows, bytes, QPS)]
+      billing[Micro‑payment Simulator\n(test credit tokens)]
+      policy[Privacy Guard (DPDP)\n• PII block • Aggregation enforcement\n• k‑anonymity cell suppression]
+      sqlv[SQL Validator / Rewriter\nSELECT‑only • Param binding • Default LIMIT]
+      router[Query Orchestrator\nTimeouts • Pagination]
+      registry[(Registry DB\nSurveys • Variables • Codebooks • Policies)]
+      cache[(Cache\nQuery hash → result)]
+      audit[(Audit & Usage Store\nStructured logs)]
+    end
+
+    apigw -->|safe SQL| duck[DuckDB Engine]
+    duck --> storage[(Survey Data Storage\nParquet/CSV on FS/S3)]
+    apigw -->|Optional federated| pg[(Postgres/Warehouse)]
+
+    apigw -->|JSON / CSV| ui
+    apigw --- audit
+    apigw --- cache
+    apigw --- registry
+    apigw --- auth
+    apigw --- meter
+    apigw --- billing
+    apigw --- policy

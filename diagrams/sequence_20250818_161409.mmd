@@ -1,0 +1,33 @@
+sequenceDiagram
+  autonumber
+  participant U as User (UI)
+  participant A as API Gateway
+  participant R as Registry (Codebooks/Policies)
+  participant P as Privacy Guard
+  participant M as Metering/Rate Limit
+  participant X as Exec Orchestrator
+  participant D as DuckDB
+  participant S as Storage (Parquet/S3)
+  participant L as Audit/Usage Log
+
+  U->>A: GET /plfs/data?state=MH&gender=female&age=15-29&group_by=state,gender
+  A->>M: Check rate + pre‑usage caps
+  M-->>A: OK (or require billing token)
+  A->>R: Load schema, allowlist filters, policies
+  A->>P: Validate filters; enforce aggregation/buckets
+  P-->>A: Safe SQL (rewritten if needed) or Reject
+  A->>X: Execute with timeout & pagination
+  X->>D: Run SQL with param binding
+  D->>S: Scan columns with pushdowns
+  S-->>D: Columnar pages
+  D-->>X: Rows + schema chunk
+  X->>P: Apply k‑anonymity cell suppression (k>=10)
+  P-->>A: Suppressed rows + policy annotations
+  A->>M: Post‑usage update (rows, bytes)
+  A->>L: Append audit {trace_id, sql_hash, caps}
+  A-->>U: 200 JSON/CSV + meta {suppression, usage}
+
+  alt Caps exceeded & no billing token
+    M-->>A: Deny (LIMIT_EXCEEDED)
+    A-->>U: 402/429 with guidance
+  end
