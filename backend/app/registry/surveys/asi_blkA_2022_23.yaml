@@ -1,0 +1,43 @@
+survey: asi_blkA_2022_23
+title: "ASI 2022-23 — Block A (Establishment details)"
+table: blkA202223
+storage:
+  format: parquet
+  path: data/parquet/blkA202223.parquet
+
+variables:
+  V1:  { label: "yr (ASI 2022-23)", type: int }
+  V2:  { label: "blk (Always A)", type: string }
+  V3:  { label: "DSL", type: string }
+  V4:  { label: "PSL No", type: string }
+  V5:  { label: "Scheme code (Census-1, Sample-2)", type: int }
+  V6:  { label: "Industry code as per Frame (NIC2008 4-digit)", type: string }
+  V7:  { label: "Industry code as per Return (NIC2008 5-digit)", type: string }
+  V8:  { label: "State code", type: int }
+  V9:  { label: "District code", type: int }
+  V10: { label: "Sector (Rural-1, Urban-2)", type: enum, values: { "1": "Rural", "2": "Urban" } }
+  V11: { label: "RO/SRO code", type: int }
+  V12: { label: "No. of units", type: int }
+  V13: { label: "Status of unit", type: string }
+  V14: { label: "Bonus (Rs.)", type: number }
+  V15: { label: "PF contribution (Rs.)", type: number }
+  V16: { label: "Welfare expenses (Rs.)", type: number }
+  V17: { label: "Working days (Manufacturing)", type: int }
+  V18: { label: "Working days (Non-Manufacturing)", type: int }
+  V19: { label: "Working days (Total)", type: int }
+  V20: { label: "Total Cost of Production (Rs.)", type: number }
+  V21: { label: "Share(%) directly exported", type: number }
+  V22: { label: "Multiplier (99999.999…)", type: number }
+
+policies:
+  pii: []               # none in this block
+  sensitive: []         # adjust later if needed
+  min_cell_count: 10
+
+allowlist_filters:
+  - V8       # State
+  - V9       # District
+  - V10      # Sector
+  - V5       # Scheme
+  - V6
+  - V7
