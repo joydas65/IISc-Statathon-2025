@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App look & feel */
+html, body, #root { height: 100%; }
+body { @apply bg-gray-50 text-gray-900 font-sans; }
+
+.btn        { @apply inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-100 active:bg-gray-200 transition; }
+.btn-primary{ @apply border-transparent bg-black text-white hover:bg-gray-900; }
+.input      { @apply w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm; }
+.select     { @apply w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm; }
+.card       { @apply rounded-xl border bg-white shadow; }
+.card-header{ @apply border-b bg-gray-50 px-4 py-2.5 text-sm font-semibold; }
+.card-body  { @apply p-4; }
+.badge      { @apply inline-block rounded-full bg-amber-50 text-amber-700 text-xs px-2 py-0.5; }
+
+.table      { @apply w-full border-collapse text-sm; }
+.table th   { @apply sticky top-0 z-10 bg-gray-50 border px-2 py-1 text-left; }
+.table td   { @apply border px-2 py-1; }
+.table tbody tr:nth-child(even) { @apply bg-gray-50; }
